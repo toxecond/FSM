@@ -9,38 +9,34 @@ import java.util.Scanner;
  * Created by jellojunkie on 1/18/16.
  */
 public class InputProcessor {
-    String headState;
-    String input;
-    List<Rule> rules;
+    private String headState;
+    private final String inputPath;
+    private final List<Rule> rules;
 
-    public InputProcessor(String input, List<Rule> rules) {
+    public InputProcessor(String inputPath, List<Rule> rules) {
         this.headState = "state1";
-        this.input = input;
+        this.inputPath = inputPath;
         this.rules = rules;
     }
 
     public void process() {
-        Scanner input = null;
+        final File input = new File(inputPath);
+
         try {
-            input = new Scanner(new File(this.input));
+            final char[] inputText = new Scanner(input).nextLine().trim().toCharArray();
+            System.out.println("Head in " + headState);
+            for (char symbol : inputText){
+                System.out.println("Read symbol '" + symbol + "'");
+                for (Rule rule: rules) {
+                    if (symbol == rule.getInputSymbol() && headState.equals(rule.getSourceState())) {
+                        headState = rule.getTargetState();
+                        System.out.println("Head in " + headState);
+                        break;
+                    }
+                }
+            }
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
-        }
-        char[] input_text = input.nextLine().trim().toCharArray();
-        System.out.println("Head in " + this.headState);
-        for (char symbol : input_text) {
-
-            System.out.println("Read symbol '" + symbol + "'");
-            for (Rule rule : this.rules) {
-                if (symbol == rule.InputSymbol && this.headState.equals(rule.sourceState)) {
-                    this.headState = rule.targetState;
-                    System.out.println("Head in " + this.headState);
-                    break;
-                }
-
-            }
-
-
         }
     }
 }

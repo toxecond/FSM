@@ -5,35 +5,42 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by jellojunkie on 1/18/16.
  */
 public class RulesLoader {
 
-    static File rules;
-    static List<Rule> result = new ArrayList<Rule>();
+    private static final Pattern PATTERN =
+            Pattern.compile("(\\w+)\\s+\\+\\s+(\\w)\\s=\\s(\\w+)");
+    private final String rulesPath;
+
 
     public RulesLoader(String rulesPath) {
-        this.rules = new File(rulesPath);
+        this.rulesPath = rulesPath;
     }
 
-    public static List<Rule> load() {
+    public List<Rule> load() {
+        final File rules = new File(this.rulesPath);
+        final List<Rule> result = new ArrayList<Rule>();
+
         try {
-            Scanner text = new Scanner(rules);
+            final Scanner text = new Scanner(rules);
             while(text.hasNextLine()){
-                String line = text.nextLine();
-                String[] splitLine = line.split("\\+");
-                String sourceState = splitLine[0].trim();
-                splitLine = splitLine[1].split("=");
-                char InputSymbol = splitLine[0].charAt(1);
-                String targetState = splitLine[1].trim();
-                Rule rule = new Rule(sourceState, InputSymbol, targetState);
-                result.add(rule);
+                final String line = text.nextLine();
+                final Matcher matcher = PATTERN.matcher(line);
+                if(matcher.matches()){
+                    final Rule rule = new Rule(matcher.group(1),
+                            matcher.group(2).charAt(0), matcher.group(3));
+                    result.add(rule);
+                }
             }
             return result;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+
     }
 }
