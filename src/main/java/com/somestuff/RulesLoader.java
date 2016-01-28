@@ -39,7 +39,7 @@ public class RulesLoader {
             }
             return result;
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new FSMException("FileNotFoundException: Cannot find file rules.txt.");
         }
 
     }
